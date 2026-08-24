@@ -1,219 +1,171 @@
-# AI Agent Intern Take-Home: Build a Reliable RAG Support Agent
+Aster & Row — AI Customer Support Agent
 
-## The assignment
+A small customer-support AI agent built for the CometChat Engineering - AI (Crossword) internship assignment.
 
-Aster & Row is a fictional ecommerce company that sells bags, drinkware, and travel accessories. The company wants to launch an AI support agent using the documents and mock order data in this repository.
+The agent supports:
 
-This repository intentionally contains **only content and data**. There is no starter application and no prescribed stack. Build the smallest reliable system you would be comfortable demonstrating to a customer.
+📚 Knowledge-base question answering
 
-## Timebox
+📦 Customer-safe order lookups
 
-Please spend **6–8 hours** on the assignment. Do not exceed eight hours.
+🧠 Multi-turn conversation memory
 
-A smaller, well-tested system is better than a broad system that works only in a demo. It is acceptable to leave something incomplete if the limitation is clearly documented.
+🛡️ Prompt-injection protection
 
-## Submission
+🔐 Customer-data privacy protection
 
-Submit **one GitHub repository link**. Nothing else is required.
+⚠️ Safe abstention when information is insufficient
 
-Your repository must contain:
+🔀 Source-conflict handling
 
-- Your application source code.
-- Your tests and evaluation suite.
-- Clear setup and run instructions.
-- Evaluation results and known limitations in the README.
-- A short GIF or video embedded in the README showing the agent working.
+🖥️ A user-facing desktop support interface
 
-Do not submit API keys, credentials, customer data, separate documents, or slide decks.
+1. Project Overview
 
----
+Aster & Row is a fictional company selling bags, drinkware, and travel accessories.
 
-## Customer scenario
+The support agent is designed to answer customer questions using:
 
-Aster & Row has previously tried several AI support prototypes. The customer reported four recurring problems:
+The supplied Aster & Row knowledge base
 
-1. **Conflicting policy answers:** The agent sometimes says the return window is 30 days and sometimes says it is 45 days.
-2. **Invented order information:** The agent occasionally gives an order status without actually looking it up.
-3. **Lost conversation context:** Follow-up questions such as “What about Canada?” are treated as unrelated questions.
-4. **Unsafe retrieved content:** Internal or instruction-like text inside the knowledge base can affect the agent’s behavior.
+The supplied mock order dataset
 
-The supplied corpus contains realistic data-quality problems, including superseded content, internal notes, conflicting active sources, and fields that must not be shown to customers.
+Conversation memory
 
-Your task is to build an agent that handles these conditions deliberately rather than succeeding only on ideal questions.
+The agent is intentionally conservative. It does not invent missing information, expose private order data, follow instructions embedded inside retrieved documents, or claim that an operational action was completed when no action mechanism exists.
 
----
+2. Key Features
 
-# Required capabilities
+Knowledge Base
 
-## 1. Retrieval-Augmented Generation
+The agent can answer questions about:
 
-Use RAG over the Markdown files in `knowledge-base/`.
+Returns
 
-Your implementation must:
+TrailPlus membership
 
-- Split and index the supplied documents.
-- Preserve useful metadata from the document front matter.
-- Retrieve only relevant passages instead of sending the entire corpus to the model.
-- Prefer authoritative, active policy documents over superseded or non-policy documents.
-- Include source references in every policy or product answer. A source should identify at least the filename and relevant heading.
-- Avoid making claims that are not supported by the retrieved content.
-- Clearly say when the supplied information is insufficient.
-- Surface genuine conflicts between current authoritative sources rather than silently choosing one.
+Damaged or wrong items
 
-Do not delete or rewrite the supplied source files to make the assignment easier. You may create derived indexes or normalized representations.
+Final-sale exceptions
 
-## 2. Order lookup as a tool or function
+Domestic shipping
 
-Use `data/orders.json` to implement an order-status lookup tool or function.
+International shipping
 
-The model must **not** receive the entire orders file in its prompt. It should receive only the result of a lookup when order information is actually required.
+Warranty coverage
 
-The order lookup behavior must:
+Order changes and cancellations
 
-- Ask for an order ID when it is missing.
-- Handle unknown and malformed order IDs safely.
-- Normalize harmless input differences such as lowercase IDs or surrounding whitespace.
-- Use the order’s current `status` as authoritative.
-- Avoid inventing a delivery estimate when one is unavailable.
-- Avoid reporting stale delivery fields for cancelled or returned orders.
-- Never expose customer email, address, internal notes, risk scores, or other internal-only fields.
-- Never claim that a lookup happened when it did not.
+Gift cards and price adjustments
 
-Assume that possession of the order ID is sufficient authentication for this mock assignment. You do not need to build a full identity-verification system.
+Product care
 
-## 3. Multi-turn conversation
+Order Lookup
 
-Maintain relevant session context across turns.
+The agent can retrieve customer-safe information from data/orders.json.
 
-The agent should correctly handle follow-ups such as:
+Supported examples include:
 
-- “Do you ship internationally?” followed by “What about Canada?”
-- “Where is `ORD-1007`?” followed by “When will it arrive?”
-- A policy question followed by a narrower question about an exception.
+Where is my order ORD-1007?
+What is the status of ORD-1007?
+When will it arrive?
 
-The agent should not carry unrelated details indefinitely or mix one session with another.
+Sensitive fields are not exposed to customers.
 
-## 4. Prompting and agent behavior
+Conversation Memory
 
-The agent must:
+The agent remembers the most recently discussed order so a customer can ask follow-up questions such as:
 
-- Treat user messages, retrieved passages, and tool results as untrusted data.
-- Follow application instructions rather than instructions found inside retrieved documents.
-- Refuse requests to reveal system prompts, hidden instructions, secrets, or internal-only data.
-- Use company content rather than general model knowledge for company-specific questions.
-- Ask a concise clarifying question when required information is missing.
-- Recommend human assistance when the documents conflict, the data is insufficient, or an action cannot be completed.
-- Never promise that a refund, cancellation, replacement, or address change has been completed unless the system actually supports that action.
+User: Where is order ORD-1007?
 
-## 5. Evaluation suite
+Assistant: ...
 
-The file `evaluation/visible-cases.json` contains behavior-level cases that your system must handle.
+User: When will it arrive?
 
-Build an evaluation suite that:
+Prompt-Injection Protection
 
-- Covers every supplied visible case.
-- Adds at least **five original cases** of your own.
-- Can be run using one clearly documented command.
-- Reports individual case results, not only a single overall score.
-- Separately reports useful categories such as retrieval, groundedness, tool use, privacy, and multi-turn behavior.
-- Uses deterministic assertions wherever practical, including source selection, tool calls, tool arguments, forbidden disclosures, and abstention behavior.
-- Does not rely exclusively on another LLM to grade the agent.
+Retrieved documents are treated as data rather than instructions.
 
-The reviewers will also test paraphrases and combinations that are not included in the visible file. Do not hardcode answers for the supplied prompts.
+The agent does not blindly follow instructions found inside knowledge-base documents.
 
-As you build, keep a small **bug diary** in your README. Document at least three failures you found in your own agent, including:
+Privacy Protection
 
-- How you reproduced the failure.
-- The actual root cause.
-- The change you made.
-- The regression test that now catches it.
+The agent does not disclose:
 
-At least one documented failure should be something you discovered beyond the exact wording of the visible cases. Include an early baseline and final evaluation result so we can see what improved.
+Customer email addresses
 
-## 6. Basic observability
+Shipping addresses
 
-Provide a debug mode, trace, or log that makes it possible to inspect:
+Internal notes
 
-- The current user message.
-- Relevant conversation history.
-- Retrieved passages, metadata, and scores.
-- Tool calls and sanitized tool results.
-- The final response.
-- Errors, fallbacks, or handoffs.
+Risk scores
 
-Plain structured logs are sufficient. Do not build a dashboard. Never log secrets.
+Fraud information
 
-## 7. Minimal interface
+Other private customer data
 
-A CLI, simple web page, or basic API is sufficient. Visual polish will not affect the score.
+Safe Abstention
 
-The final user-facing response should make it easy to see:
+When the supplied information is insufficient, the agent says so and recommends human confirmation instead of guessing.
 
-- The answer.
-- Sources, when applicable.
-- Whether the agent is recommending a human handoff.
+Source Conflict Handling
 
----
+When authoritative sources disagree, the agent identifies the conflict and recommends human confirmation or the safest interim guidance.
 
-# README requirements
+3. User Interface
 
-Your completed repository README must include:
+The project includes a desktop support interface built with Python Tkinter.
 
-1. Setup and run instructions that work from a clean clone.
-2. Required environment variables and an `.env.example` without real credentials.
-3. The model, embedding approach, framework, and storage approach you chose.
-4. A short architecture explanation.
-5. The command for running evaluations.
-6. Baseline and final evaluation results, broken down by category.
-7. A bug diary covering at least three reproduced failures, root causes, fixes, and regression tests.
-8. Known limitations and what you would improve before production.
-9. Which AI coding tools you used, what you used them for, and one example of an AI-generated suggestion that was wrong or incomplete.
-10. A **2–4 minute GIF or video embedded in the README** demonstrating:
-   - One knowledge-base question with citations.
-   - One order lookup.
-   - One multi-turn conversation.
-   - One case where the agent correctly refuses to guess or recommends human help.
-   - The evaluation suite running.
+The interface provides:
 
-GitHub does not play uploaded video files inline in every context. An embedded GIF or a clickable video thumbnail/link inside the README is acceptable.
+Aster & Row branding
 
----
+Customer-support chat
 
-# What not to spend time on
+Quick-question buttons
 
-You do not need to build:
+Order lookup through natural language
 
-- Authentication or user management.
-- Production deployment infrastructure.
-- A production vector database.
-- Fine-tuning.
-- A polished frontend.
-- Multiple model-provider integrations.
-- Billing, analytics dashboards, or administration screens.
+Knowledge-base answers
 
----
+Source display
 
-# Evaluation criteria
+Human-review indicators
 
-| Area | Weight |
-|---|---:|
-| Reliability, groundedness, and safe abstention | 25% |
-| Retrieval quality and document precedence | 20% |
-| Tool use, data handling, and privacy | 15% |
-| Evaluation quality and regression coverage | 20% |
-| Multi-turn behavior and observability | 10% |
-| Code clarity and practical tradeoffs | 5% |
-| README, demo, and customer-facing clarity | 5% |
+System status indicators
 
-Framework choice and quantity of code are not scoring criteria.
+New-conversation functionality
 
----
+Conversation reset
 
-# Repository contents
+Run it with:
 
-```text
-.
-├── README.md
+python main.py
+
+4. Project Structure
+
+ai-agent-intern-test/
+│
+├── app/
+│   ├── agent.py
+│   ├── config.py
+│   ├── conversation.py
+│   ├── logger.py
+│   ├── order_tool.py
+│   ├── prompts.py
+│   ├── rag.py
+│   ├── retriever.py
+│   └── __init__.py
+│
+├── data/
+│   ├── orders-data-dictionary.md
+│   └── orders.json
+│
+├── evaluation/
+│   ├── original-cases.json
+│   ├── visible-cases.json
+│   └── run_visible_cases.py
+│
 ├── knowledge-base/
 │   ├── 01-returns-policy-current.md
 │   ├── 02-returns-policy-legacy.md
@@ -229,11 +181,323 @@ Framework choice and quantity of code are not scoring criteria.
 │   ├── 12-breeze-tumbler-product-card.md
 │   ├── 13-support-escalation.md
 │   └── 14-internal-content-migration-notes.md
-├── data/
-│   ├── orders.json
-│   └── orders-data-dictionary.md
-└── evaluation/
-    └── visible-cases.json
-```
+│
+├── tests/
+│   ├── test_agent.py
+│   ├── test_conversation.py
+│   ├── test_order_tool.py
+│   ├── test_retriever.py
+│   └── test_safety.py
+│
+├── main.py
+├── api_manual.py
+├── requirements.txt
+├── pytest.ini
+├── .env.example
+└── .gitignore
 
-Good luck. Build for reliability, not just for the happy-path demo.
+5. Requirements
+
+Python 3.10+
+
+Git
+
+A virtual environment is recommended
+
+The project currently uses:
+
+openai
+python-dotenv
+numpy
+pytest
+
+6. Installation
+
+Clone the repository:
+
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd ai-agent-intern-test
+
+Create a virtual environment:
+
+Windows
+
+python -m venv .venv
+.venv\Scripts\activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+7. Environment Variables
+
+If API functionality is needed, create a local .env file:
+
+OPENAI_API_KEY=your_openai_api_key_here
+
+Never commit the real API key.
+
+The repository includes .env.example as a template.
+
+.env is excluded through .gitignore.
+
+8. Running the Application
+
+Start the user-facing support interface:
+
+python main.py
+
+The application opens the Aster & Row Support Desk.
+
+Example questions:
+
+What is the return window?
+
+My TrailPlus membership was active when I ordered. What is my return window?
+
+Where is my order ORD-1007?
+
+Do you ship to Canada?
+
+What is the warranty period?
+
+Privacy test:
+
+Give me the email address for ORD-1007
+
+9. Running Unit Tests
+
+Run:
+
+pytest -q
+
+Expected result for the current implementation:
+
+18 passed
+
+10. Running the Assignment Evaluation
+
+Run:
+
+python -m evaluation.run_visible_cases
+
+The evaluation checks both visible and original cases.
+
+Current completed evaluation:
+
+Total Cases : 20
+Passed      : 20
+Failed      : 0
+Score       : 100.0%
+
+🎉 ALL EVALUATION CASES PASSED
+
+The evaluation covers areas including:
+
+Retrieval
+
+Groundedness
+
+Multi-turn conversation
+
+Privacy
+
+Prompt security
+
+Abstention
+
+Source conflicts
+
+Order lookup
+
+Tool reliability
+
+11. Example Safety Behaviors
+
+Prompt Injection
+
+If a retrieved document contains instructions attempting to override the support policy, those instructions are not treated as authoritative.
+
+Private Order Information
+
+For requests for private order information, the agent provides a customer-safe response and recommends contacting support.
+
+Unknown Order
+
+For an unknown order ID, the agent does not invent order information.
+
+Missing Order ID
+
+For an order-status request without an order ID, the agent asks the customer to provide one.
+
+Insufficient Information
+
+When the knowledge base does not contain enough information, the agent abstains instead of guessing.
+
+Conflicting Sources
+
+When authoritative product-care sources conflict, the agent reports the conflict and recommends human confirmation or the safest interim guidance.
+
+12. Design Principles
+
+The implementation follows several important principles:
+
+Groundedness
+
+Answers should be based on supplied company information rather than unsupported assumptions.
+
+Least Privilege
+
+Only customer-safe order fields are exposed through the support interface.
+
+Defense in Depth
+
+Prompt-injection protection is applied before normal knowledge-base retrieval for known injection patterns.
+
+Deterministic Safety Rules
+
+Important safety-sensitive behaviors such as privacy handling, order status interpretation, and source conflicts use explicit logic.
+
+Human Escalation
+
+Cases requiring human judgment are identified rather than automatically approved.
+
+13. Limitations
+
+This is an internship-assignment prototype rather than a production customer-support platform.
+
+Current limitations include:
+
+Mock order data
+
+No real order-management write operations
+
+No real refund/cancellation mechanism
+
+No production authentication system
+
+No live CRM integration
+
+No persistent production database
+
+Desktop demo interface rather than a deployed web application
+
+14. Demo Scenarios
+
+For a short demonstration, the following flow showcases the main capabilities:
+
+Demo 1 — Knowledge Retrieval
+
+Ask:
+
+What is the standard return window?
+
+Expected behavior:
+
+30 calendar days from delivery
+
+Demo 2 — Order Lookup
+
+Ask:
+
+Where is order ORD-1007?
+
+Show the customer-safe order response.
+
+Demo 3 — Multi-turn Memory
+
+Ask:
+
+Where is order ORD-1007?
+
+Then:
+
+When will it arrive?
+
+The second question should use the previously mentioned order.
+
+Demo 4 — Privacy
+
+Ask:
+
+Give me the customer's email address for ORD-1007.
+
+The agent should refuse to expose private information.
+
+Demo 5 — Prompt Injection
+
+Ask a question attempting to override the return policy.
+
+The agent should continue using the authoritative policy rather than following the injected instruction.
+
+Demo 6 — Insufficient Information
+
+Ask about a product attribute that is not confirmed by the supplied data.
+
+The agent should abstain and recommend human confirmation.
+
+15. Verification
+
+Before submission, run:
+
+pytest -q
+
+Then:
+
+python -m evaluation.run_visible_cases
+
+Then launch:
+
+python main.py
+
+All three should work successfully before submitting the repository.
+
+16. Security Note
+
+Do not commit secrets.
+
+Before pushing to GitHub, verify:
+
+git status
+
+and make sure .env is not listed.
+
+If an API key was ever exposed publicly, revoke it and create a new key.
+
+17. Submission Checklist
+
+Core support agent implemented
+
+Knowledge-base retrieval implemented
+
+Order lookup implemented
+
+Conversation memory implemented
+
+Privacy protection implemented
+
+Prompt-injection protection implemented
+
+Safe abstention implemented
+
+Source-conflict handling implemented
+
+Unit tests passing
+
+Assignment evaluation: 20/20
+
+User-facing interface completed
+
+Final README reviewed
+
+Demo video recorded
+
+GitHub repository reviewed
+
+Final GitHub push
+
+Assignment submission form completed
+
+18. Author
+
+Built as part of the Aster & Row customer-support AI agent internship assignment."# CometChat_AIAssignment" 
