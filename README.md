@@ -299,9 +299,6 @@ CometChat_AIAssignment/
 │   ├── orders-data-dictionary.md
 │   └── orders.json
 │
-├── demo/
-│   └── aster-row-ai-agent-demo.mp4
-│
 ├── evaluation/
 │   ├── original-cases.json
 │   ├── visible-cases.json
