@@ -34,7 +34,7 @@ The demo demonstrates the main capabilities of the Aster & Row support agent, in
 * Safe handling of insufficient information
 * Human escalation
 
-**Demo:** [Watch the Aster & Row AI Support Agent Demo](demo/aster-row-ai-agent-demo.mp4)
+
 
 ---
 
