@@ -1,0 +1,9 @@
+ai-agent-intern-test/
+|-- app/
+|-- data/
+|-- evaluation/
+|-- knowledge-base/
+|-- tests/
+|-- README.md
+|-- requirements.txt
+|-- .env.example
