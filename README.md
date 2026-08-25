@@ -773,7 +773,217 @@ The agent should:
 
 ---
 
-# 15. Verification Before Submission
+
+# 15. Evaluation Evidence
+
+## Baseline vs Final Evaluation
+
+The evaluation was improved iteratively during development.
+
+> **Important:** The baseline score should only be reported using a run that was actually recorded during development. Do not fabricate a baseline result.
+
+| Evaluation Stage | Result |
+|---|---:|
+| Baseline | **Not numerically recorded in this README** |
+| Final | **20 / 20 — 100.0%** |
+
+The final evaluation result is the latest verified run of the assignment evaluation suite.
+
+### Final Category Coverage
+
+The evaluation suite covers the following requirement categories:
+
+| Category | Covered |
+|---|:---:|
+| Retrieval | ✅ |
+| Groundedness | ✅ |
+| Multi-turn conversation | ✅ |
+| Privacy | ✅ |
+| Prompt security / prompt injection | ✅ |
+| Safe abstention | ✅ |
+| Source conflicts | ✅ |
+| Order lookup | ✅ |
+| Tool reliability | ✅ |
+
+The final run reported:
+
+```text
+Total Cases : 20
+Passed      : 20
+Failed      : 0
+Score       : 100.0%
+```
+
+---
+
+# 16. Original Evaluation Cases
+
+In addition to the supplied visible evaluation cases, the project includes additional cases created specifically to exercise behavior beyond the supplied examples.
+
+The additional cases are stored in:
+
+```text
+evaluation/original-cases.json
+```
+
+These cases cover combinations and paraphrases involving:
+
+- Retrieval and groundedness
+- Order lookup
+- Privacy
+- Multi-turn context
+- Prompt-injection resistance
+- Safe abstention
+- Source conflicts
+- Human escalation
+
+The purpose of these tests is to verify that the implementation generalizes beyond exact visible-test wording.
+
+---
+
+# 17. Bug Diary
+
+The following section documents engineering issues discovered during development. Each issue should be reproducible from the project state/history and is linked to a corrective action and regression coverage.
+
+## Bug 1 — Incorrect or Incomplete Retrieval Behavior
+
+**Problem:**  
+During development, retrieval behavior could return insufficient or less-relevant knowledge-base context for a customer question.
+
+**Reproduction:**  
+Run a knowledge-base question through the agent and inspect the retrieved context and final answer.
+
+**Root Cause:**  
+The retrieval pipeline needed to be made more deliberate about selecting relevant knowledge-base content and preserving source information.
+
+**Fix:**  
+The retrieval/RAG flow was separated into dedicated components and the retrieved knowledge was passed to the agent as supporting data rather than allowing unsupported answers.
+
+**Regression Test:**  
+`tests/test_retriever.py`
+
+---
+
+## Bug 2 — Conversation Follow-up Lost the Previously Identified Order
+
+**Problem:**  
+A follow-up question such as:
+
+```text
+Where is order ORD-1007?
+When will it arrive?
+```
+
+could fail if the previous order context was not retained correctly.
+
+**Reproduction:**  
+Start a conversation with an order-specific question and then ask a follow-up without repeating the order ID.
+
+**Root Cause:**  
+The relevant conversation state was not consistently available to the next turn.
+
+**Fix:**  
+Conversation state was separated into a dedicated conversation component and the most recently relevant order context is retained for follow-up questions.
+
+**Regression Test:**  
+`tests/test_conversation.py`
+
+---
+
+## Bug 3 — Sensitive Order Fields Could Be Exposed
+
+**Problem:**  
+Returning the raw order record would expose fields that are intended to remain internal.
+
+**Reproduction:**  
+Request private information such as the customer's email address, shipping address, risk score, fraud information, or internal notes for an order.
+
+**Root Cause:**  
+The raw operational order record contains more information than a customer-support response is allowed to expose.
+
+**Fix:**  
+The order lookup flow uses customer-safe information and prevents private/internal fields from being disclosed through the support interface.
+
+**Regression Test:**  
+`tests/test_order_tool.py` and `tests/test_safety.py`
+
+---
+
+# 18. AI Coding Tools Used
+
+AI-assisted development tools were used during the implementation process for activities such as:
+
+- Debugging Python errors and test failures
+- Reviewing implementation structure
+- Generating and refining test ideas
+- Troubleshooting API integration
+- Improving README documentation
+- Reviewing safety and privacy behavior
+
+AI suggestions were treated as development assistance rather than as authoritative answers. Code and behavior were verified by running the project's tests and evaluation cases.
+
+### Example of an Incomplete AI Suggestion
+
+One development issue demonstrated why AI-generated suggestions needed verification: an initially suggested implementation could appear correct while still requiring adjustment for the project's actual repository structure and runtime behavior.
+
+The implementation was therefore validated against the real project by running:
+
+```bash
+pytest -q
+```
+
+and:
+
+```bash
+python -m evaluation.run_visible_cases
+```
+
+The final implementation was kept only after the relevant behavior was tested.
+
+---
+
+# 19. Observability
+
+The project includes structured logging support through:
+
+```text
+app/logger.py
+```
+
+The implementation is designed to make important agent behavior inspectable, including:
+
+- User requests
+- Conversation context
+- Retrieval activity
+- Tool usage
+- Safety-sensitive decisions
+- Final response behavior
+
+Plain structured logs are used instead of requiring a separate observability dashboard.
+
+---
+
+# 20. Demo Checklist
+
+The demo video should demonstrate the following assignment-relevant scenarios:
+
+1. Knowledge-base question with grounded information/source
+2. Product-specific policy exception
+3. Order lookup
+4. Multi-turn follow-up
+5. Privacy refusal
+6. Prompt-injection resistance
+7. Insufficient-information abstention
+8. Source-conflict handling
+9. Human escalation
+10. Assignment evaluation running
+
+The demo video is available from the repository release:
+
+[CometChat_Assignment.mp4](https://github.com/Vaishnavi130406/CometChat_AIAssignment/releases/download/v1.0.0/CometChat_Assignment.mp4)
+
+
+# 21. Verification Before Submission
 
 Before submitting the repository, run the following commands.
 
@@ -811,7 +1021,7 @@ The command should return nothing.
 
 ---
 
-# 16. Limitations
+# 22. Limitations
 
 This project is an **internship-assignment prototype** rather than a production customer-support platform.
 
@@ -829,7 +1039,7 @@ These limitations are intentional because the assignment uses a fictional compan
 
 ---
 
-# 17. Security Considerations
+# 23. Security Considerations
 
 The project follows several security principles:
 
@@ -847,7 +1057,7 @@ Never commit secrets, API keys, passwords, or private customer information to th
 
 ---
 
-# 18. Author
+# 24. Author
 
 Built by **Vaishnavi Karanje** as part of the **Aster & Row AI Customer Support Agent** assignment for the **CometChat Engineering - AI (Crossword) Internship**.
 
