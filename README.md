@@ -34,7 +34,7 @@ The demo demonstrates the main capabilities of the Aster & Row support agent, in
 * Safe handling of insufficient information
 * Human escalation
 
-Download the demo: [CometChat_Assignment.mp4](https://github.com/Vaishnavi130406/CometChat_AIAssignment/releases/download/v1.0.0/CometChat_Assignment.mp4)
+Demo video available in the v1.0.0 release: [CometChat_Assignment.mp4](https://github.com/Vaishnavi130406/CometChat_AIAssignment/releases/download/v1.0.0/CometChat_Assignment.mp4)
 ---
 
 # 1. Project Overview
